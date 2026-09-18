@@ -29,7 +29,7 @@ class Provider(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20, validators=[phone_validator])
-    service_area = models.CharField(max_length=255, blank=True)
+    service_area = models.CharField(max_length=255, blank=True, validators=[validate_not_blank])
     status = models.CharField(max_length=20,
                               choices=Status.choices,
                               default=Status.PENDING)
@@ -42,8 +42,8 @@ class Provider(models.Model):
 class ProviderAgreement(models.Model):
     provider = models.OneToOneField(Provider, on_delete=models.CASCADE,
                                     related_name='agreement')
-    vision = models.PositiveIntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
+    version = models.PositiveIntegerField(default=1)
+    signed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Agreement v{self.vision} - {self.provider}"

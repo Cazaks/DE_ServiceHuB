@@ -43,4 +43,4 @@ class ServiceOffer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Offer for request #{self.request.pl} - {self.quoted_price}'
+        return f'Offer for request #{self.request.pk} - {self.quoted_price}'
