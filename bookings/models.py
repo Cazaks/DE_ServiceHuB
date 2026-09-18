@@ -35,3 +35,13 @@ class Assignee(models.Model):
 
     def __str__(self):
         return f'Assignment #{self.pk} - {self.provider} ({self.get_assignmentstatus_display()})'
+
+
+class Review(models.Model):
+    booking = models.OneToOneField(Booking, on_delete=models.CASCADE, related_name='review')
+    rating = models.PositiveSmallIntegerField()
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Review for Booking #{self.booking.pk} - {self.rating}/5'
