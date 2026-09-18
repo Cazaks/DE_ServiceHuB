@@ -6,6 +6,9 @@ class ServiceCategory(models.Model):
     name = models.CharField(max_length=100, unique=True)
     holdback_days = models.PositiveBigIntegerField(default=7)
 
+    class Meta:
+        verbose_name_plural = 'Service Categories'
+
     def __str__(self):
         return self.name
 
