@@ -1,6 +1,9 @@
+from decimal import Decimal
 from datetime import timedelta
 from django.db import models
+from django.core.validators import MinValueValidator
 from bookings.models import Booking, Assignment
+
 
 class CustomerPayment(models.Model):
     class Status(models.TextChoices):
@@ -9,7 +12,7 @@ class CustomerPayment(models.Model):
         REFUNDED = 'refunded', 'Refunded'
 
     booking = models.OneToOneField(Booking, on_delete=models.PROTECT, related_name='payment')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     paid_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -27,8 +30,8 @@ class ProviderPayout(models.Model):
         FORFEITED = 'forfeited', 'Holdback forfeited'
 
     assignment = models.OneToOneField(Assignment, on_delete=models.PROTECT, related_name='payout')
-    initial_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    holdback_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    initial_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
+    holdback_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     release_due_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     initial_paid_at = models.DateTimeField(null=True, blank=True)
