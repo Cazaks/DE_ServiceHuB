@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from accounts.models import Customer, Provider
 from services.models import ServiceCategory, ServiceRequest, ServiceOffer
 from .models import Booking, Assignment
-
+from decimal import Decimal
+from django.core.exceptions import ValidationError
 
 class BookingStatusTests(TestCase):
     def setUp(self):
@@ -65,3 +66,12 @@ class AssignmentTests(TestCase):
             payout_amount='14000.00',
         )
         self.assertTrue(hasattr(self.booking, 'assignment'))
+
+    def test_negative_payout_amount_is_rejected(self):
+        assignment = Assignment(
+            booking=self.booking,
+            provider=self.provider,
+            payout_amount=Decimal('-1000.00'),
+        )
+        with self.assertRaises(ValidationError):
+            assignment.full_clean()

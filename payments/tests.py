@@ -6,6 +6,7 @@ from accounts.models import Customer, Provider
 from services.models import ServiceCategory, ServiceRequest, ServiceOffer
 from bookings.models import Booking, Assignment
 from .models import ProviderPayout
+from django.utils import timezone
 
 from django.core.exceptions import ValidationError
 
@@ -50,3 +51,12 @@ class ProviderPayoutReleaseDateTests(TestCase):
         self.payout.holdback_amount = Decimal('-100.00')
         with self.assertRaises(ValidationError):
             self.payout.full_clean()
+
+    def test_release_date_adds_category_holdback_days(self):
+        self.booking.customer_confirmed_at = timezone.now()
+        self.booking.save()
+
+        result = self.payout.calculate_release_due_date()
+        expected = (self.booking.customer_confirmed_at + timezone.timedelta(days=7)).date()
+
+        self.assertEqual(result, expected)

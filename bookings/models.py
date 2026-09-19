@@ -1,6 +1,8 @@
 from django.db import models
 from accounts.models import Provider
 from services.models import ServiceOffer
+from decimal import Decimal
+from django.core.validators import MinValueValidator
 
 
 class Booking(models.Model):
@@ -30,7 +32,7 @@ class Assignment(models.Model):
 
     booking = models.OneToOneField(Booking, on_delete=models.PROTECT, related_name='assignment')
     provider = models.ForeignKey(Provider, on_delete=models.PROTECT, related_name='assignments')
-    payout_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payout_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     status = models.CharField(max_length=25, choices=AssignmentStatus.choices, default=AssignmentStatus.OFFERED)
     created_at = models.DateTimeField(auto_now_add=True)
 

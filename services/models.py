@@ -1,5 +1,7 @@
 from django.db import models
 from accounts.models import Customer, Provider
+from decimal import Decimal
+from django.core.validators import MinValueValidator
 
 
 class ServiceCategory(models.Model):
@@ -38,7 +40,7 @@ class ServiceOffer(models.Model):
         DECLINED = 'declined', 'Declined'
 
     request = models.OneToOneField(ServiceRequest, on_delete=models.CASCADE, related_name='offer')
-    quoted_price = models.DecimalField(max_digits=10, decimal_places=2)
+    quoted_price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
 
