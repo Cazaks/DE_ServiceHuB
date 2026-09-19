@@ -1,7 +1,9 @@
-from django.urls import path
-from . import views
+from rest_framework.routers import DefaultRouter
+from .views import ServiceCategoryViewSet, ServiceRequestViewSet, ServiceOfferViewSet
 
-urlpatterns = [
-    path('', views.category_list, name='category_list'),
-    path('<int:pk>/', views.category_detail, name='category_detail'),
-]
+router = DefaultRouter()
+router.register('categories', ServiceCategoryViewSet)
+router.register('requests', ServiceRequestViewSet)
+router.register('offers', ServiceOfferViewSet)
+
+urlpatterns = router.urls
