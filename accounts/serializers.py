@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from services.models import ServiceCategory
 from .models import Customer, Provider, ProviderAgreement, phone_validator, validate_not_blank
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password as django_validate_password
@@ -15,7 +17,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 class ProviderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Provider
-        fields = ['id', 'user', 'phone_number', 'service_area', 'status', 'created_at']
+        fields = ['id', 'user', 'phone_number', 'service_area', 'qualified_categories', 'status', 'created_at']
         read_only_fields = ['id', 'status', 'created_at']
 
 
@@ -25,7 +27,7 @@ class ProviderAgreementSerializer(serializers.ModelSerializer):
         fields = ['id', 'provider', 'version', 'signed_at']
         read_only_fields = ['id', 'signed_at']
 
-class CustomerRegistrationSerializer(serializers.ModelSerializer):
+class CustomerRegistrationSerializer(serializers.Serializer):
     username = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
@@ -61,19 +63,15 @@ class CustomerRegistrationSerializer(serializers.ModelSerializer):
         return Customer.objects.create(user=user, phone_number=validated_data['phone_number'])
 
 
-class ProviderRegistrationSerializer(serializers.ModelSerializer):
-    class ProviderSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = Provider
-            fields = ['id', 'user', 'phone_number', 'service_area', 'qualified_categories', 'status', 'created_at']
-            read_only_fields = ['id', 'status', 'created_at']
-
-
+class ProviderRegistrationSerializer(serializers.Serializer):
     username = serializers.CharField()
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
     phone_number = serializers.CharField(validators=[phone_validator])
-    service_area = serializers.CharField()
+    service_area = serializers.CharField(validators = [validate_not_blank])
+    qualified_categories = serializers.PrimaryKeyRelatedField(
+        queryset = ServiceCategory.objects.all(), many=True, required=False
+    )
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
@@ -93,9 +91,16 @@ class ProviderRegistrationSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        categories = validated_data.pop('qualified_categories', [])
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password'],
-            service_area=validated_data['service_area']
         )
+        provider = Provider.objects.create(
+            user=user,
+            phone_number=validated_data['phone_number'],
+            service_area = validated_data['service_area'],
+        )
+        provider.qualified_categories.set(categories)
+        return provider
