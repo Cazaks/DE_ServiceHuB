@@ -1,12 +1,18 @@
-from django.shortcuts import render, get_object_or_404
-from .models import ServiceCategory
+from rest_framework import viewsets
+from .models import ServiceCategory, ServiceRequest, ServiceOffer
+from .serializers import ServiceCategorySerializer, ServiceRequestSerializer, ServiceOfferSerializer
 
 
-def category_list(request):
-    categories = ServiceCategory.objects.all()
-    return render(request, 'services/category_list.html', {'categories': categories})
+class ServiceCategoryViewSet(viewsets.ModelViewSet):
+    queryset = ServiceCategory.objects.all()
+    serializer_class = ServiceCategorySerializer
 
 
-def category_detail(request, pk):
-    category = get_object_or_404(ServiceCategory, pk=pk)
-    return render(request, 'services/category_detail.html', {'category': category})
+class ServiceRequestViewSet(viewsets.ModelViewSet):
+    queryset = ServiceRequest.objects.all()
+    serializer_class = ServiceRequestSerializer
+
+
+class ServiceOfferViewSet(viewsets.ModelViewSet):
+    queryset = ServiceOffer.objects.all()
+    serializer_class = ServiceOfferSerializer
