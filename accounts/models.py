@@ -30,6 +30,9 @@ class Provider(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20, validators=[phone_validator])
     service_area = models.CharField(max_length=255, blank=True, validators=[validate_not_blank])
+    qualified_categories = models.ManyToManyField(
+        'services.ServiceCategory',
+        related_name='qualified_providers', blank=True)
     status = models.CharField(max_length=20,
                               choices=Status.choices,
                               default=Status.PENDING)
