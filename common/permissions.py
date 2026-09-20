@@ -46,7 +46,7 @@ class IsSelfOrAdmin(BasePermission):
         return obj.user == request.user
 
 
-class IsSelfOrReadOnly(BasePermission):
+class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         if request.method in SAFE_METHODS:
             return True
