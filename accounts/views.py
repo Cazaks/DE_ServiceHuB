@@ -31,9 +31,17 @@ class ProviderViewSet(viewsets.ModelViewSet):
     serializer_class = ProviderSerializer
 
 
-class ProviderAgreementViewSet(viewsets.ModelViewSet):
-    queryset = ProviderAgreement.objects.all()
-    serializer_class = ProviderAgreementSerializer
+class ProviderViewSet(viewsets.ModelViewSet):
+    serializer_class = ProviderSerializer
+    permission_classes = [IsAuthenticated, IsSelfOrAdmin]
+
+    def get_queryset(self):
+        role = get_role(self.request.user)
+        if role == 'admin':
+            return Provider.objects.all()
+        if role == 'provider':
+            return Provider.objects.filter(user=self.request.user)
+        return Provider.objects.none()
 
 
 class RegisterCustomerView(APIView):
