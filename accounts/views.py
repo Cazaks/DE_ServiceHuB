@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
-from common.permissions import IsOwnerOrAdmin
+from common.permissions import IsSelfOrAdmin
 from common.roles import get_role
 from .models import Customer, Provider, ProviderAgreement
 from .serializers import (
@@ -14,8 +14,7 @@ from .serializers import (
 
 class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
-    owner_field = 'user'
+    permission_classes = [IsAuthenticated, IsSelfOrAdmin]
 
     def get_queryset(self):
         role = get_role(self.request.user)

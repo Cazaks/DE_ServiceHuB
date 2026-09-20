@@ -7,7 +7,7 @@ from .views import (
 from django.urls import path
 
 router = DefaultRouter()
-router.register('customers', CustomerViewSet)
+router.register('customers', CustomerViewSet, basename='customer')
 router.register('providers', ProviderViewSet)
 router.register('provider-agreements', ProviderAgreementViewSet)
 

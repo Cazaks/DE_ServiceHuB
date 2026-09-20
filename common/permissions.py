@@ -30,3 +30,15 @@ class IsOwnerOrAdmin(BasePermission):
             return owner == request.user.provider
 
         return False
+
+class IsSelfOrAdmin(BasePermission):
+    """
+        For models where the object itself IS the user's profile
+        (e.g. Customer, Provider) — checks obj.user == request.user directly.
+        """
+
+    def has_object_permission(self, request, view,obj):
+        role = get_role(request.user)
+        if role == 'admin':
+            return True
+        return obj.user == request.user
