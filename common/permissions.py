@@ -22,7 +22,7 @@ class IsOwnerOrAdmin(BasePermission):
         if owner_field is None:
             return False
 
-        owner = getattr(obj, 'owner_field', None)
+        owner = getattr(obj, owner_field, None)
         if role == 'customer':
             return owner == request.user.customer
 

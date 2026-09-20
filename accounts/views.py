@@ -1,8 +1,10 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
+from common.permissions import IsOwnerOrAdmin
+from common.roles import get_role
 from .models import Customer, Provider, ProviderAgreement
 from .serializers import (
     CustomerSerializer, ProviderSerializer, ProviderAgreementSerializer,
@@ -11,8 +13,18 @@ from .serializers import (
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    owner_field = 'user'
+
+    def get_queryset(self):
+        role = get_role(self.request.user)
+        if role == 'admin':
+            return Customer.objects.all()
+
+        if role == 'customer':
+            return Customer.objects.filter(user=self.request.user)
+        return Customer.objects.none()
 
 
 class ProviderViewSet(viewsets.ModelViewSet):
