@@ -20,15 +20,9 @@ class CustomerViewSet(viewsets.ModelViewSet):
         role = get_role(self.request.user)
         if role == 'admin':
             return Customer.objects.all()
-
         if role == 'customer':
             return Customer.objects.filter(user=self.request.user)
         return Customer.objects.none()
-
-
-class ProviderViewSet(viewsets.ModelViewSet):
-    queryset = Provider.objects.all()
-    serializer_class = ProviderSerializer
 
 
 class ProviderViewSet(viewsets.ModelViewSet):
@@ -42,6 +36,11 @@ class ProviderViewSet(viewsets.ModelViewSet):
         if role == 'provider':
             return Provider.objects.filter(user=self.request.user)
         return Provider.objects.none()
+
+
+class ProviderAgreementViewSet(viewsets.ModelViewSet):
+    queryset = ProviderAgreement.objects.all()
+    serializer_class = ProviderAgreementSerializer
 
 
 class RegisterCustomerView(APIView):
