@@ -19,6 +19,10 @@ class Booking(models.Model):
     customer_confirmed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def customer(self):
+        return self.offer.request.customer
+
     def __str__(self):
         return f'Booking #{self.pk} - {self.get_status_display()}'
 
