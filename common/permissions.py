@@ -16,8 +16,7 @@ class IsOwnerOrAdmin(BasePermission):
         """
 
     def has_object_permission(self, request, view, obj):
-        role = get_role(request.user)
-        if role == 'admin':
+        if request.user.is_staff:
             return True
 
         owner_field = getattr(view, 'owner_field', None)
@@ -25,12 +24,12 @@ class IsOwnerOrAdmin(BasePermission):
             return False
 
         owner = getattr(obj, owner_field, None)
-        if role == 'customer':
-            return owner == request.user.customer
+        user = request.user
 
-        if role == 'provider':
-            return owner == request.user.provider
-
+        if hasattr(user, 'customer') and owner == user.customer:
+            return True
+        if hasattr(user, 'provider') and owner == user.provider:
+            return True
         return False
 
 class IsSelfOrAdmin(BasePermission):
@@ -38,10 +37,8 @@ class IsSelfOrAdmin(BasePermission):
         For models where the object itself IS the user's profile
         (e.g. Customer, Provider) — checks obj.user == request.user directly.
         """
-
-    def has_object_permission(self, request, view,obj):
-        role = get_role(request.user)
-        if role == 'admin':
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_staff:
             return True
         return obj.user == request.user
 
