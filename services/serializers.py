@@ -13,7 +13,7 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceRequest
         fields = ['id', 'customer', 'category', 'description', 'availability_window', 'status', 'created_at']
-        read_only_fields = ['id', 'status', 'created_at']
+        read_only_fields = ['id', 'customer', 'status', 'created_at']
 
 
 class ServiceOfferSerializer(serializers.ModelSerializer):
