@@ -1,13 +1,17 @@
 from rest_framework import viewsets
-from common.permissions import IsOwnerOrAdmin
+from common.permissions import IsOwnerOrAdmin, IsAdmin
 from .models import Booking, Assignment, Review
 from .serializers import BookingSerializer, AssignmentSerializer, ReviewSerializer
 
 
 class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
-    permission_classes = [IsOwnerOrAdmin]
     owner_field = 'customer'
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAdmin()]
+        return [IsOwnerOrAdmin()]
 
     def get_queryset(self):
         user = self.request.user
@@ -20,8 +24,12 @@ class BookingViewSet(viewsets.ModelViewSet):
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
-    permission_classes = [IsOwnerOrAdmin]
     owner_field = 'provider'
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAdmin()]
+        return [IsOwnerOrAdmin()]
 
     def get_queryset(self):
         user = self.request.user
