@@ -17,11 +17,12 @@ class CustomerPayment(models.Model):
     paid_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
+    @property
+    def customer(self):
+        return self.booking.customer
 
     def __str__(self):
         return f'Payment for Booking #{self.booking.pk} — {self.amount} ({self.get_status_display()})'
-
 
 class ProviderPayout(models.Model):
     class Status(models.TextChoices):
@@ -47,6 +48,10 @@ class ProviderPayout(models.Model):
             return None
         holdback_days = booking.offer.request.category.holdback_days
         return (confirmed_at + timedelta(days=holdback_days)).date()
+
+    @property
+    def provider(self):
+        return self.assignment.provider
 
     def __str__(self):
         return f'Payout for Assignment #{self.assignment.pk} — {self.get_status_display()}'
