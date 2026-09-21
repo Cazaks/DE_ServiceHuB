@@ -40,6 +40,10 @@ class Assignment(models.Model):
     status = models.CharField(max_length=25, choices=AssignmentStatus.choices, default=AssignmentStatus.OFFERED)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def customer(self):
+        return self.booking.customer
+
     def __str__(self):
         return f'Assignment #{self.pk} - {self.provider} ({self.get_status_display()})'
 
