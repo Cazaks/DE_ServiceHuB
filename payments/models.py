@@ -17,6 +17,8 @@ class CustomerPayment(models.Model):
     paid_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+
     def __str__(self):
         return f'Payment for Booking #{self.booking.pk} — {self.amount} ({self.get_status_display()})'
 
