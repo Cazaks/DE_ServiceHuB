@@ -3,7 +3,7 @@ from .views import ServiceCategoryViewSet, ServiceRequestViewSet, ServiceOfferVi
 
 router = DefaultRouter()
 router.register('categories', ServiceCategoryViewSet)
-router.register('requests', ServiceRequestViewSet)
-router.register('offers', ServiceOfferViewSet)
+router.register('requests', ServiceRequestViewSet, basename='servicerequest')
+router.register('offers', ServiceOfferViewSet, basename='serviceoffer')
 
 urlpatterns = router.urls
