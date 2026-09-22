@@ -10,6 +10,7 @@ from .serializers import (
     CustomerSerializer, ProviderSerializer, ProviderAgreementSerializer,
     CustomerRegistrationSerializer, ProviderRegistrationSerializer,
 )
+from drf_spectacular.utils import extend_schema
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -46,6 +47,10 @@ class ProviderAgreementViewSet(viewsets.ModelViewSet):
 class RegisterCustomerView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=CustomerRegistrationSerializer,
+        responses={201: CustomerRegistrationSerializer},
+    )
     def post(self, request):
         serializer = CustomerRegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -57,6 +62,10 @@ class RegisterCustomerView(APIView):
 class RegisterProviderView(APIView):
     permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=ProviderRegistrationSerializer,
+        responses={201: ProviderRegistrationSerializer},
+    )
     def post(self, request):
         serializer = ProviderRegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

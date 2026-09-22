@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+
+from services.models import ServiceCategory
 from .models import Customer, Provider
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
@@ -118,5 +120,58 @@ class ProviderViewSetPermissionTests(APITestCase):
         response = self.client.get('/api/accounts/providers/')
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['id'], self.provider.id)
+
+class RegistrationValidationTests(APITestCase):
+    def test_customer_registration_rejects_duplicate_username(self):
+        User.objects.create_user(username='dupuser', password='pass12345')
+        response = self.client.post('/api/accounts/register/customer/', {
+            'username': 'dupuser',
+            'email': 'unique1@example.com',
+            'password': 'SomeStrongPass123!',
+            'phone_number': '08011119999',
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_customer_registration_rejects_duplicate_email(self):
+        User.objects.create_user(username='someoneelse', email='taken@example.com', password='pass12345')
+        response = self.client.post('/api/accounts/register/customer/', {
+            'username': 'newusername',
+            'email': 'taken@example.com',
+            'password': 'SomeStrongPass123!',
+            'phone_number': '08011118888',
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_customer_registration_rejects_weak_password(self):
+        response = self.client.post('/api/accounts/register/customer/', {
+            'username': 'weakpassuser',
+            'email': 'weakpass@example.com',
+            'password': '12345',
+            'phone_number': '08011117777',
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_provider_registration_requires_at_least_one_category(self):
+        response = self.client.post('/api/accounts/register/provider/', {
+            'username': 'noqualtest',
+            'email': 'noqualtest@example.com',
+            'password': 'SomeStrongPass123!',
+            'phone_number': '08077770000',
+            'service_area': 'Yaba',
+        }, format='json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_provider_registration_succeeds_with_multiple_categories(self):
+        cat1 = ServiceCategory.objects.create(name='Test Cat A', holdback_days=7)
+        cat2 = ServiceCategory.objects.create(name='Test Cat B', holdback_days=14)
+        response = self.client.post('/api/accounts/register/provider/', {
+            'username': 'multitest',
+            'email': 'multitest@example.com',
+            'password': 'SomeStrongPass123!',
+            'phone_number': '08077771111',
+            'service_area': 'Yaba',
+            'qualified_categories': [cat1.id, cat2.id],
+        })
+        self.assertEqual(response.status_code, 201)
 
 

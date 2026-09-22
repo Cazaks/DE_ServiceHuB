@@ -143,6 +143,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'DE ServiceHub API',
+    'DESCRIPTION': 'Backend API for a managed service-provider platform.',
+    'VERSION': '1.0.0',
 }

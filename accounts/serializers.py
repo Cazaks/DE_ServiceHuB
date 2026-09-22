@@ -70,7 +70,7 @@ class ProviderRegistrationSerializer(serializers.Serializer):
     phone_number = serializers.CharField(validators=[phone_validator])
     service_area = serializers.CharField(validators = [validate_not_blank])
     qualified_categories = serializers.PrimaryKeyRelatedField(
-        queryset = ServiceCategory.objects.all(), many=True, required=False
+        queryset = ServiceCategory.objects.all(), many=True, allow_empty=False
     )
 
     def validate_username(self, value):
